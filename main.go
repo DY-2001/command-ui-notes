@@ -145,7 +145,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						return m, nil
 					}
 
+					m.list.ResetFilter()
 					m.list.SetItems(listFiles())
+
 
 					// if len(m.list.Items()) == 0 {
 					// 	m.showingList = false
