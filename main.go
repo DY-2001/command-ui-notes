@@ -54,8 +54,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+q", "q":
-			if m.currentFile != nil || m.createFileInputVisible {
-				break
+			filterIsHappening := false
+			if m.showingList && m.list.FilterState() == list.Filtering {
+				filterIsHappening = true
+			}
+			if m.currentFile != nil || m.createFileInputVisible || filterIsHappening {
+				return m, nil
 			}
 			return m, tea.Quit
 		case "esc":
@@ -77,12 +81,36 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 		case "ctrl+l":
+			if m.currentFile != nil {
+				return m, nil
+			}
+			if m.createFileInputVisible {
+				m.createFileInputVisible = false
+				m.newFileInput.SetValue("")
+			}
 			noteList := listFiles()
 			m.list.SetItems(noteList)
+			if m.showingList == true {
+				if m.list.FilterState() == list.Filtering {
+					m.list.ResetFilter()
+				}
+			}
 			m.showingList = true
 			return m, nil
 		case "ctrl+n":
+			if m.currentFile != nil {
+				return m, nil
+			}
+
+			if m.showingList {
+				if m.list.FilterState() == list.Filtering {
+					m.list.ResetFilter()
+				}
+					
+				m.showingList = false
+			}
 			m.createFileInputVisible = true
+			m.newFileInput.SetValue("")
 			return m, nil
 		case "ctrl+s":
 			if m.currentFile != nil {
@@ -145,7 +173,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	if( m.createFileInputVisible) {
 		m.newFileInput, cmd = m.newFileInput.Update(msg)
-		return m, cmd
 	}
 
 	if m.currentFile != nil {
@@ -163,8 +190,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var style = lipgloss.NewStyle().
 	                        Bold(true).
-							Foreground(lipgloss.Color("16")).
-							Background(lipgloss.Color("254")).
+							// Foreground(lipgloss.Color("16")).
+							// Background(lipgloss.Color("254")).
 							Padding(1)
 
 	welcome := style.Render("Welcome to the Notes app! 🧠")
