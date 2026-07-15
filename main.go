@@ -98,6 +98,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.showingList = true
 			return m, nil
 		case "ctrl+n":
+			if m.createFileInputVisible {
+				return m, nil
+			}
 			if m.currentFile != nil {
 				return m, nil
 			}
