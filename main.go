@@ -197,7 +197,7 @@ func (m model) View() string {
 							// Background(lipgloss.Color("254")).
 							Padding(1)
 
-	welcome := style.Render("Welcome to the Notes app! 🧠")
+	welcome := style.Render("Welcome to the Notes app! 🤗")
 
 	help := "Ctrl+N: new file | ctrl+L: list files | Esc: back | ctrl+S: save | ctrl+Q: quit"
 
@@ -232,7 +232,7 @@ func initialModel() model {
 	ti.TextStyle = cursorStyle
 
 	ta := textarea.New()
-	ta.Placeholder = "Start typing your note here... "
+	ta.Placeholder = "Start typing your note here... 🧠"
 	ta.ShowLineNumbers = false
 	ta.Focus()
 	
