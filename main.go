@@ -126,12 +126,43 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.currentFile = nil
 				m.noteTextArea.SetValue("")
 			}
+		case "ctrl+d":
+			if m.currentFile != nil {
+				break
+			}
+
+			if m.showingList {
+				if m.list.FilterState() == list.Filtering {
+					break
+				}
+				item, ok := m.list.SelectedItem().(item)
+				if ok {
+					filePath := fmt.Sprintf("%s/%s", vaultDir, item.title)
+
+					err := os.Remove(filePath)
+					if err != nil {
+						fmt.Println("Error deleting file:", err)
+						return m, nil
+					}
+
+					m.list.SetItems(listFiles())
+
+					// if len(m.list.Items()) == 0 {
+					// 	m.showingList = false
+					// }
+				}
+
+				return m, nil
+			}
 		case "enter":
 			if m.currentFile != nil {
 				break
 			}
 
 			if m.showingList {
+				if m.list.FilterState() == list.Filtering {
+					break
+				}
 				item, ok := m.list.SelectedItem().(item)
 				if ok {
 					filePath := fmt.Sprintf("%s/%s", vaultDir, item.title)
@@ -199,7 +230,7 @@ func (m model) View() string {
 
 	welcome := style.Render("Welcome to the Notes app! 🤗")
 
-	help := "Ctrl+N: new file | ctrl+L: list files | Esc: back | ctrl+S: save | ctrl+Q: quit"
+	help := "Ctrl+N: new file | ctrl+L: list files | Esc: back | ctrl+d: delete file | ctrl+S: save file | ctrl+Q: quit"
 
 	view := ""
 	if m.createFileInputVisible {
